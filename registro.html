@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Usuario - PizzicoApp</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <span class="nav-logo" onclick="location.href='index.html'" style="cursor:pointer">PIZZICO <strong>APP</strong></span>
+            <div class="nav-links">
+                <a href="index.html">Volver al Inicio</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <h1>Crear Nuevo Empleado</h1>
+        
+        <div class="card" style="max-width: 500px; margin: 0 auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="input-group">
+                <label style="font-weight: bold; margin-bottom: 5px; display: block;">Nombre del Empleado</label>
+                <input type="text" id="new-nome" placeholder="Ej: Marco Rossi" autocomplete="off">
+                
+                <label style="font-weight: bold; margin-top: 15px; margin-bottom: 5px; display: block;">PIN Personal (4 cifras)</label>
+                <input type="password" id="new-pin" placeholder="1234" maxlength="4" inputmode="numeric">
+            </div>
+            
+            <button class="btn-confirm" onclick="crearUsuario()" style="width: 100%; margin-top: 10px;">
+                GUARDAR USUARIO
+            </button>
+        </div>
+    </main>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc, serverTimestamp, getDoc, setDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Tu configuración de PizzicoApp
+const firebaseConfig = {
+    apiKey: "AIzaSyB9v1mRG1qNGIbb68IO0DfII7mQuIT830o",
+    authDomain: "pizzicoapp.firebaseapp.com",
+    projectId: "pizzicoapp",
+    storageBucket: "pizzicoapp.firebasestorage.app",
+    messagingSenderId: "667497262667",
+    appId: "1:667497262667:web:7edf9e047321ce1fd867ce"
+};
+
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let accionActual = '';
+
+// --- FUNCIONES PARA EL MODAL (index.html) ---
+window.openModal = function(tipo) {
+    accionActual = tipo;
+    const modal = document.getElementById('auth-modal');
+    if(modal) {
+        modal.style.display = 'flex';
+        document.getElementById('modal-title').innerText = tipo === 'entrada' ? 'CONFIRMAR ENTRADA' : 'CONFIRMAR SALIDA';
+        document.getElementById('modal-title').style.color = tipo === 'entrada' ? '#27ae60' : '#e74c3c';
+    }
+}
+
+window.closeModal = function() {
+    const modal = document.getElementById('auth-modal');
+    if(modal) modal.style.display = 'none';
+}
+
+// --- CONFIRMAR ACCIÓN (LOGIN/LOGOUT) ACTUALIZADO ---
+window.confirmarAccion = async function() {
+    const nombre = document.getElementById('modal-nombre').value.trim();
+    const pin = document.getElementById('modal-pin').value.trim();
+
+    if (!nombre || pin.length < 4) return alert("Por favor, introduce nombre y PIN de 4 cifras");
+
+    try {
+        const userRef = doc(db, "usuarios", nombre);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists() || userSnap.data().pin !== pin) {
+            return alert("Usuario o PIN incorrectos");
+        }
+
+        // Buscamos si el usuario ya tiene una sesión abierta (salida == null)
+        const qBuscador = query(collection(db, "fichajes"), 
+                          where("nombre", "==", nombre), 
+                          where("salida", "==", null));
+        const snap = await getDocs(qBuscador);
+
+        if (accionActual === 'entrada') {
+            // VALIDACIÓN: Si ya hay una entrada sin salida, no permitimos otra entrada
+            if (!snap.empty) {
+                return alert("⚠️ Ya tienes una entrada activa. Debes marcar SALIDA antes de entrar de nuevo.");
+            }
+
+            await addDoc(collection(db, "fichajes"), {
+                nombre: nombre,
+                entrada: serverTimestamp(),
+                salida: null,
+                mesAnio: `${new Date().getMonth() + 1}-${new Date().getFullYear()}`,
+                horas: 0
+            });
+            alert("✅ Entrada registrada. ¡Hola " + nombre + "!");
+            
+        } else {
+            // VALIDACIÓN: Si no hay entrada abierta, no puede marcar salida
+            if (snap.empty) {
+                return alert("❌ No puedes marcar SALIDA porque no tienes una entrada registrada hoy.");
+            }
+
+            const docRef = doc(db, "fichajes", snap.docs[0].id);
+            await updateDoc(docRef, { 
+                salida: serverTimestamp() 
+            });
+            alert("✅ Salida registrada. ¡Buen descanso, " + nombre + "!");
+        }
+        closeModal();
+    } catch (e) {
+        console.error(e);
+        alert("Error de conexión con la base de datos");
+    }
+}
+
+// --- CREAR USUARIO (registro.html) ---
+window.crearUsuario = async function() {
+    const nombre = document.getElementById('new-nome').value.trim();
+    const pin = document.getElementById('new-pin').value.trim();
+
+    if (!nombre || pin.length < 4) return alert("Introduce un nombre y un PIN de 4 cifras");
+
+    try {
+        await setDoc(doc(db, "usuarios", nombre), {
+            nombre: nombre,
+            pin: pin
+        });
+        alert("✅ Usuario " + nombre + " creado correctamente.");
+        window.location.href = "index.html";
+    } catch (e) {
+        alert("Error al guardar el usuario");
+    }
+}
+
+// --- LÓGICA DE ESTADÍSTICAS (EN ESPAÑOL) ---
+
+// 1. Riempie il menu a tendina con gli ultimi 6 mesi
+function inicializarSelectorMeses() {
+    const select = document.getElementById('select-mes');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Seleccione un mes...</option>';
+    const ahora = new Date();
+    
+    for (let i = 0; i < 6; i++) {
+        const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+        const mes = d.getMonth() + 1;
+        const anio = d.getFullYear();
+        
+        // Nome del mese in spagnolo
+        const label = d.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+        const value = `${mes}-${anio}`;
+        
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+        select.appendChild(option);
+    }
+}
+
+// 2. Filtra e visualizza le ore del mese selezionato
+window.cargarEstadisticas = async function() {
+    const mesSeleccionado = document.getElementById('select-mes').value;
+    const tbody = document.getElementById('stats-body');
+    if (!mesSeleccionado || !tbody) return;
+
+    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding: 20px;">Calculando horas...</td></tr>';
+
+    try {
+        // Query a Firebase filtrando per il mese selezionato
+        const q = query(collection(db, "fichajes"), where("mesAnio", "==", mesSeleccionado));
+        const snap = await getDocs(q);
+        
+        const resumen = {}; 
+
+        snap.forEach(doc => {
+            const data = doc.data();
+            if (data.salida && data.entrada) {
+                const entrada = data.entrada.toDate();
+                const salida = data.salida.toDate();
+                const horas = (salida - entrada) / (1000 * 60 * 60); 
+                
+                if (!resumen[data.nombre]) resumen[data.nombre] = 0;
+                resumen[data.nombre] += horas;
+            }
+        });
+
+        // Genera le righe della tabella
+        tbody.innerHTML = '';
+        const nombres = Object.keys(resumen);
+        
+        if (nombres.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding: 20px;">No hay registros para este mes.</td></tr>';
+            return;
+        }
+
+        nombres.forEach(nombre => {
+            const fila = `<tr>
+                <td style="padding: 15px; border-bottom: 1px solid #eee;">${nombre}</td>
+                <td style="padding: 15px; border-bottom: 1px solid #eee;"><strong>${resumen[nombre].toFixed(2)} h</strong></td>
+            </tr>`;
+            tbody.innerHTML += fila;
+        });
+
+    } catch (e) {
+        console.error("Error cargando estadísticas:", e);
+        alert("Error al conectar con la base de datos.");
+    }
+}
+
+// Inizializza il menu appena la pagina viene caricata
+document.addEventListener('DOMContentLoaded', () => {
+    if(document.getElementById('select-mes')) {
+        inicializarSelectorMeses();
+    }
+});

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - PizzicoApp</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <span class="nav-logo" onclick="location.href='index.html'" style="cursor:pointer">PIZZICO <strong>APP</strong></span>
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="registro.html">Crear Usuario</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <h1>Resumen Mensual</h1>
+        
+        <div class="card" style="margin-bottom: 20px;">
+            <label for="select-mes" style="display: block; margin-bottom: 10px; font-weight: bold;">Seleccionar Mes:</label>
+            <select id="select-mes" onchange="cargarEstadisticas()" style="width: 100%; padding: 15px; font-size: 1.2rem; border-radius: 10px; border: 2px solid #2980b9;">
+                <option value="">Cargando meses...</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <div class="table-container">
+                <table id="table-stats">
+                    <thead>
+                        <tr>
+                            <th>Empleado</th>
+                            <th>Horas Totales</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stats-body">
+                        <tr>
+                            <td colspan="2" style="text-align:center; padding: 20px;">Seleccione un mes del menú superior</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
