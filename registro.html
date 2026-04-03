@@ -8,32 +8,54 @@
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <span class="nav-logo" onclick="location.href='index.html'" style="cursor:pointer">PIZZICO <strong>APP</strong></span>
-            <div class="nav-links">
-                <a href="index.html">Volver al Inicio</a>
-            </div>
+    <!-- PANTALLA DE BLOQUEO -->
+    <div id="lock-screen" class="lock-screen">
+        <div class="lock-box">
+            <div class="lock-icon">🔒</div>
+            <h2 class="lock-title">PIZZICO APP</h2>
+            <p class="lock-subtitle">Acceso restringido a la postación autorizada</p>
+            <input 
+                type="password" 
+                id="lock-password" 
+                class="lock-input"
+                placeholder="Contraseña de postación"
+                maxlength="30"
+            >
+            <button class="lock-btn" onclick="desbloquearApp()">ACCEDER</button>
         </div>
-    </nav>
+    </div>
 
-    <main class="main-container">
-        <h1>Crear Nuevo Empleado</h1>
-        
-        <div class="card" style="max-width: 500px; margin: 0 auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            <div class="input-group">
-                <label style="font-weight: bold; margin-bottom: 5px; display: block;">Nombre del Empleado</label>
-                <input type="text" id="new-nome" placeholder="Ej: Marco Rossi" autocomplete="off">
-                
-                <label style="font-weight: bold; margin-top: 15px; margin-bottom: 5px; display: block;">PIN Personal (4 cifras)</label>
-                <input type="password" id="new-pin" placeholder="1234" maxlength="4" inputmode="numeric">
+    <!-- CONTENIDO DE LA APP -->
+    <div id="app-content" style="display:none;">
+
+        <nav class="navbar">
+            <div class="nav-container">
+                <span class="nav-logo" onclick="location.href='index.html'" style="cursor:pointer">PIZZICO <strong>APP</strong></span>
+                <div class="nav-links">
+                    <a href="index.html">Volver al Inicio</a>
+                </div>
             </div>
+        </nav>
+
+        <main class="main-container">
+            <h1>Crear Nuevo Empleado</h1>
             
-            <button class="btn-confirm" onclick="crearUsuario()" style="width: 100%; margin-top: 10px;">
-                GUARDAR USUARIO
-            </button>
-        </div>
-    </main>
+            <div class="card" style="max-width: 500px; margin: 0 auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div class="input-group">
+                    <label style="font-weight: bold; margin-bottom: 5px; display: block;">Nombre del Empleado</label>
+                    <input type="text" id="new-nome" placeholder="Ej: Marco Rossi" autocomplete="off">
+                    
+                    <label style="font-weight: bold; margin-top: 15px; margin-bottom: 5px; display: block;">PIN Personal (4 cifras)</label>
+                    <input type="password" id="new-pin" placeholder="1234" maxlength="4" inputmode="numeric">
+                </div>
+                
+                <button class="btn-confirm" onclick="crearUsuario()" style="width: 100%; margin-top: 10px;">
+                    GUARDAR USUARIO
+                </button>
+            </div>
+        </main>
+
+    </div><!-- fin #app-content -->
 
     <script type="module" src="app.js"></script>
 </body>
