@@ -18,7 +18,81 @@ const db = getFirestore(app);
 
 let accionActual = '';
 
+// ============================================================
+// --- SISTEMA DE PROTECCIÓN POR CONTRASEÑA DE POSTACIÓN ---
+// ============================================================
+
+// ⚙️ CAMBIA ESTA CONTRASEÑA POR LA QUE TÚ QUIERAS
+const PASSWORD_POSTACION = "CAVANI";
+const STORAGE_KEY = "pizzico_auth_ok";
+
+// Comprueba si este navegador ya está autenticado
+function estaAutenticado() {
+    return localStorage.getItem(STORAGE_KEY) === "true";
+}
+
+// Muestra u oculta la app según el estado de autenticación
+function verificarAcceso() {
+    const lockScreen = document.getElementById('lock-screen');
+    const appContent = document.getElementById('app-content');
+    if (!lockScreen || !appContent) return; // página sin protección
+
+    if (estaAutenticado()) {
+        lockScreen.style.display = 'none';
+        appContent.style.display = 'block';
+    } else {
+        lockScreen.style.display = 'flex';
+        appContent.style.display = 'none';
+    }
+}
+
+// Función llamada desde el botón de la pantalla de bloqueo
+window.desbloquearApp = function() {
+    const inputPass = document.getElementById('lock-password');
+    if (!inputPass) return;
+    const valor = inputPass.value.trim();
+
+    if (valor === PASSWORD_POSTACION) {
+        localStorage.setItem(STORAGE_KEY, "true");
+        verificarAcceso();
+    } else {
+        // Animación de error
+        inputPass.value = '';
+        inputPass.placeholder = '❌ Contraseña incorrecta';
+        inputPass.style.borderColor = '#e74c3c';
+        setTimeout(() => {
+            inputPass.placeholder = 'Contraseña de postación';
+            inputPass.style.borderColor = '';
+        }, 2000);
+    }
+}
+
+// Permite cerrar sesión (útil si quieres "desautorizar" la tablet)
+window.cerrarSesionPostacion = function() {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+}
+
+// Detectar Enter en el campo de contraseña
+document.addEventListener('DOMContentLoaded', () => {
+    verificarAcceso();
+
+    const lockInput = document.getElementById('lock-password');
+    if (lockInput) {
+        lockInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') window.desbloquearApp();
+        });
+    }
+
+    if (document.getElementById('select-mes')) {
+        inicializarSelectorMeses();
+    }
+});
+
+// ============================================================
 // --- FUNCIONES PARA EL MODAL (index.html) ---
+// ============================================================
+
 window.openModal = function(tipo) {
     accionActual = tipo;
     const modal = document.getElementById('auth-modal');
@@ -34,7 +108,7 @@ window.closeModal = function() {
     if(modal) modal.style.display = 'none';
 }
 
-// --- CONFIRMAR ACCIÓN (LOGIN/LOGOUT) ACTUALIZADO ---
+// --- CONFIRMAR ACCIÓN (LOGIN/LOGOUT) ---
 window.confirmarAccion = async function() {
     const nombre = document.getElementById('modal-nombre').value.trim();
     const pin = document.getElementById('modal-pin').value.trim();
@@ -49,14 +123,12 @@ window.confirmarAccion = async function() {
             return alert("Usuario o PIN incorrectos");
         }
 
-        // Buscamos si el usuario ya tiene una sesión abierta (salida == null)
         const qBuscador = query(collection(db, "fichajes"), 
                           where("nombre", "==", nombre), 
                           where("salida", "==", null));
         const snap = await getDocs(qBuscador);
 
         if (accionActual === 'entrada') {
-            // VALIDACIÓN: Si ya hay una entrada sin salida, no permitimos otra entrada
             if (!snap.empty) {
                 return alert("⚠️ Ya tienes una entrada activa. Debes marcar SALIDA antes de entrar de nuevo.");
             }
@@ -71,7 +143,6 @@ window.confirmarAccion = async function() {
             alert("✅ Entrada registrada. ¡Hola " + nombre + "!");
             
         } else {
-            // VALIDACIÓN: Si no hay entrada abierta, no puede marcar salida
             if (snap.empty) {
                 return alert("❌ No puedes marcar SALIDA porque no tienes una entrada registrada hoy.");
             }
@@ -108,9 +179,8 @@ window.crearUsuario = async function() {
     }
 }
 
-// --- LÓGICA DE ESTADÍSTICAS (EN ESPAÑOL) ---
+// --- LÓGICA DE ESTADÍSTICAS ---
 
-// 1. Riempie il menu a tendina con gli ultimi 6 mesi
 function inicializarSelectorMeses() {
     const select = document.getElementById('select-mes');
     if (!select) return;
@@ -122,8 +192,6 @@ function inicializarSelectorMeses() {
         const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
         const mes = d.getMonth() + 1;
         const anio = d.getFullYear();
-        
-        // Nome del mese in spagnolo
         const label = d.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
         const value = `${mes}-${anio}`;
         
@@ -134,7 +202,6 @@ function inicializarSelectorMeses() {
     }
 }
 
-// 2. Filtra e visualizza le ore del mese selezionato
 window.cargarEstadisticas = async function() {
     const mesSeleccionado = document.getElementById('select-mes').value;
     const tbody = document.getElementById('stats-body');
@@ -143,7 +210,6 @@ window.cargarEstadisticas = async function() {
     tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding: 20px;">Calculando horas...</td></tr>';
 
     try {
-        // Query a Firebase filtrando per il mese selezionato
         const q = query(collection(db, "fichajes"), where("mesAnio", "==", mesSeleccionado));
         const snap = await getDocs(q);
         
@@ -161,7 +227,6 @@ window.cargarEstadisticas = async function() {
             }
         });
 
-        // Genera le righe della tabella
         tbody.innerHTML = '';
         const nombres = Object.keys(resumen);
         
@@ -183,10 +248,3 @@ window.cargarEstadisticas = async function() {
         alert("Error al conectar con la base de datos.");
     }
 }
-
-// Inizializza il menu appena la pagina viene caricata
-document.addEventListener('DOMContentLoaded', () => {
-    if(document.getElementById('select-mes')) {
-        inicializarSelectorMeses();
-    }
-});
