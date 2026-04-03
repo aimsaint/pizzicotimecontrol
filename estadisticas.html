@@ -8,44 +8,66 @@
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <span class="nav-logo" onclick="location.href='index.html'" style="cursor:pointer">PIZZICO <strong>APP</strong></span>
-            <div class="nav-links">
-                <a href="index.html">Inicio</a>
-                <a href="registro.html">Crear Usuario</a>
-            </div>
+    <!-- PANTALLA DE BLOQUEO -->
+    <div id="lock-screen" class="lock-screen">
+        <div class="lock-box">
+            <div class="lock-icon">🔒</div>
+            <h2 class="lock-title">PIZZICO APP</h2>
+            <p class="lock-subtitle">Acceso restringido a la postación autorizada</p>
+            <input 
+                type="password" 
+                id="lock-password" 
+                class="lock-input"
+                placeholder="Contraseña de postación"
+                maxlength="30"
+            >
+            <button class="lock-btn" onclick="desbloquearApp()">ACCEDER</button>
         </div>
-    </nav>
+    </div>
 
-    <main class="main-container">
-        <h1>Resumen Mensual</h1>
-        
-        <div class="card" style="margin-bottom: 20px;">
-            <label for="select-mes" style="display: block; margin-bottom: 10px; font-weight: bold;">Seleccionar Mes:</label>
-            <select id="select-mes" onchange="cargarEstadisticas()" style="width: 100%; padding: 15px; font-size: 1.2rem; border-radius: 10px; border: 2px solid #2980b9;">
-                <option value="">Cargando meses...</option>
-            </select>
-        </div>
+    <!-- CONTENIDO DE LA APP -->
+    <div id="app-content" style="display:none;">
 
-        <div class="card">
-            <div class="table-container">
-                <table id="table-stats">
-                    <thead>
-                        <tr>
-                            <th>Empleado</th>
-                            <th>Horas Totales</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stats-body">
-                        <tr>
-                            <td colspan="2" style="text-align:center; padding: 20px;">Seleccione un mes del menú superior</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <nav class="navbar">
+            <div class="nav-container">
+                <span class="nav-logo" onclick="location.href='index.html'" style="cursor:pointer">PIZZICO <strong>APP</strong></span>
+                <div class="nav-links">
+                    <a href="index.html">Inicio</a>
+                    <a href="registro.html">Crear Usuario</a>
+                </div>
             </div>
-        </div>
-    </main>
+        </nav>
+
+        <main class="main-container">
+            <h1>Resumen Mensual</h1>
+            
+            <div class="card" style="margin-bottom: 20px;">
+                <label for="select-mes" style="display: block; margin-bottom: 10px; font-weight: bold;">Seleccionar Mes:</label>
+                <select id="select-mes" onchange="cargarEstadisticas()" style="width: 100%; padding: 15px; font-size: 1.2rem; border-radius: 10px; border: 2px solid #2980b9;">
+                    <option value="">Cargando meses...</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table id="table-stats">
+                        <thead>
+                            <tr>
+                                <th>Empleado</th>
+                                <th>Horas Totales</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-body">
+                            <tr>
+                                <td colspan="2" style="text-align:center; padding: 20px;">Seleccione un mes del menú superior</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+    </div><!-- fin #app-content -->
 
     <script type="module" src="app.js"></script>
 </body>
