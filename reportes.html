@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - PizzicoApp</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- PANTALLA DE BLOQUEO -->
+    <div id="lock-screen" class="lock-screen">
+        <div class="lock-box">
+            <div class="lock-icon">🔒</div>
+            <h2 class="lock-title">PIZZICO APP</h2>
+            <p class="lock-subtitle">Acceso restringido a la postación autorizada</p>
+            <input type="password" id="lock-password" class="lock-input" placeholder="Contraseña de postación" maxlength="30">
+            <button class="lock-btn" onclick="desbloquearApp()">ACCEDER</button>
+        </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div id="app-content" style="display:none;">
+
+        <nav class="navbar">
+            <div class="nav-container">
+                <span class="nav-logo" onclick="location.href='index.html'" style="cursor:pointer">PIZZICO <strong>APP</strong></span>
+                <div class="nav-links">
+                    <a href="index.html">Inicio</a>
+                    <a href="estadisticas.html">Estadísticas</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-container" style="text-align:left;">
+            <h1 style="text-align:center;">Reportes de Horarios</h1>
+            <div id="reporte-container">
+                <!-- Se rellena automáticamente con JS -->
+            </div>
+        </main>
+
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

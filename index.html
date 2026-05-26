@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PIZZICO APP - Control</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div id="lock-screen" class="lock-screen">
+        <div class="lock-box">
+            <div class="lock-icon">🔒</div>
+            <h2 class="lock-title">PIZZICO APP</h2>
+            <p class="lock-subtitle">Acceso restringido a la postación autorizada</p>
+            <input type="password" id="lock-password" class="lock-input" placeholder="Contraseña de postación" maxlength="30">
+            <button class="lock-btn" onclick="desbloquearApp()">ACCEDER</button>
+        </div>
+    </div>
+
+    <div id="app-content" style="display:none;">
+
+        <nav class="navbar">
+            <div class="nav-container">
+                <span class="nav-logo">PIZZICOAPP <strong>TIME CONTROL</strong></span>
+                <div class="nav-links">
+                    <a href="registro.html">Crear Usuario</a>
+                    <a href="estadisticas.html">Estadísticas</a>
+                    <a href="reportes.html">Reportes</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-container">
+            <h1>Seleccione Acción</h1>
+            <div class="circle-container">
+                <button class="btn-circle btn-login" onclick="openModal('entrada')">
+                    <span class="icon">➜</span>
+                    <span class="text">LOGIN</span>
+                    <small>Entrada</small>
+                </button>
+                <button class="btn-circle btn-logout" onclick="openModal('salida')">
+                    <span class="icon">✖</span>
+                    <span class="text">LOGOUT</span>
+                    <small>Salida</small>
+                </button>
+            </div>
+            <p style="margin-top: 60px;">
+                <a href="#" onclick="cerrarSesionPostacion()" class="link-reset">Revocar acceso de esta postación</a>
+            </p>
+        </main>
+
+        <div id="auth-modal" class="modal">
+            <div class="modal-content">
+                <h2 id="modal-title">Confirmar Acceso</h2>
+                <div class="input-group">
+                    <input type="text" id="modal-nombre" placeholder="Nombre del empleado" autocomplete="off">
+                    <input type="password" id="modal-pin" placeholder="PIN de 4 cifras" maxlength="4" inputmode="numeric">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-confirm" onclick="confirmarAccion()">CONFIRMAR</button>
+                    <button class="btn-cancel" onclick="closeModal()">CANCELAR</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
